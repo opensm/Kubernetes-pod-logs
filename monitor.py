@@ -5,6 +5,7 @@ import sys
 import signal
 from multiprocessing import Process
 import os
+from settings import *
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -30,12 +31,8 @@ class MonitorPod:
         ).items]
         return pods
 
-    def alert(self, secret, corpid, agentid, party, message):
+    def alert(self, message):
         """
-        :param secret:
-        :param corpid:
-        :param agentid:
-        :param party:
         :param message:
         :return:
         """
@@ -43,15 +40,15 @@ class MonitorPod:
         import json
         url = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={}&corpsecret={}'
         try:
-            getr = requests.get(url=url.format(corpid, secret))
+            getr = requests.get(url=url.format(CORPID, SECRET))
             access_token = getr.json().get('access_token')
         except Exception as error:
             print("获取token失败，{}".format(error))
             sys.exit(1)
         data = {
-            "toparty": party,  # 向这些部门发送
+            "toparty": PARTY,  # 向这些部门发送
             "msgtype": "text",
-            "agentid": agentid,  # 应用的 id 号
+            "agentid": AGENTID,  # 应用的 id 号
             "text": {
                 "content": message
             }
@@ -80,16 +77,10 @@ def run_alert_logs(pod, namespace):
             for log in ERROR_KEYS:
                 if log not in e:
                     continue
-                message = "{}:日志异常:{}！".format(pod,e)
+                message = "{}:日志异常:{}！".format(pod, e)
                 print(message)
-                # if not k.alert(
-                #         message=message,
-                #         corpid=1000030,
-                #         agentid="aaaa",
-                #         party="aaaa",
-                #         secret="4KMlUU6brl7DBUoHM0YBAKRU6yexoVh9Be8WeT69h44"
-                # ):
-                #     os.kill(os.getgid(), signal.SIGINT)
+                if not k.alert(message=message):
+                    os.kill(os.getgid(), signal.SIGINT)
 
     except Exception as error:
         print("进程退出：{}".format(error))
