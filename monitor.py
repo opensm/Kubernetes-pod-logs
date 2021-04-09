@@ -58,7 +58,9 @@ class MonitorPod:
                 url="https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={}".format(access_token),
                 data=json.dumps(data)
             )
-            print("发送消息成功:{}".format(r.json()))
+            if r.json()['errcode'] != 0:
+                raise Exception(r.json()['errmsg'])
+            print("发送消息成功:{}".format(r.json()['errmsg']))
             return True
         except Exception as error:
             print("发送消息失败,{}".format(error))
@@ -78,13 +80,15 @@ def run_alert_logs(pod, namespace):
                 if log not in e:
                     continue
                 message = "{}:日志异常:{}！".format(pod, e)
-                print(message)
-                if not k.alert(message=message):
+                result = k.alert(message=message)
+                if not message:
+                    print("发送异常，即将退出！{}".format(result))
                     os.kill(os.getgid(), signal.SIGINT)
-
+                else:
+                    print("发送成功，{}".format(e))
     except Exception as error:
         print("进程退出：{}".format(error))
-        os.kill(os.getgid(), signal.SIGINT)
+        os.kill(os.getpid(), signal.SIGINT)
 
 
 class SubProcessManager:
