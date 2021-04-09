@@ -11,7 +11,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 ERROR_KEYS = ['Error']
-config.load_kube_config(config_file='./config')
+config.load_kube_config(config_file='/root/.kube/config')
 
 
 class MonitorPod:
@@ -119,4 +119,4 @@ class SubProcessManager:
 
 if __name__ == '__main__':
     s = SubProcessManager()
-    s.run_process(label="app.kubernetes.io/name=ingress-nginx", namespace="ingress-nginx")
+    s.run_process(label=LABEL, namespace=NAMESPACE)

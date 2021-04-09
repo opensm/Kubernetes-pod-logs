@@ -1,0 +1,6 @@
+SECRET = "4KMlUU6brl7DBUoHM0YBAKRU6yexoVh9Be8WeT69h44"
+CORPID = "ww084eeda5e1dc7f0e"
+AGENTID = "1000030"
+PARTY = "1702010522"
+LABEL = "qcloud-app=comu-game"
+NAMESPACE = "iov-baicorv-prd"
